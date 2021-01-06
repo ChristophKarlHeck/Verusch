@@ -16,18 +16,18 @@
  */
 
 import { BASE_URI, HttpStatus } from '../shared';
-import type { CookieService } from './cookie.service';
+import { CookieService } from './cookie.service';
 import { Injectable } from '@angular/core';
 
 enum Rolle {
-    ROLE_ADMIN = 'admin',
-    ROLE_KUNDE = 'kunde',
-    ROLE_MITARBEITER = 'mitarbeiter',
+    ROLE_ADMIN,
+    ROLE_KUNDE,
+    ROLE_MITARBEITER,
 }
 
 export interface Identity {
     username: string;
-    rollen: Rolle[];
+    rollen: Array<Rolle>;
     password?: string;
 }
 
@@ -52,9 +52,7 @@ export class BasicAuthService {
         const base64 = window.btoa(`${username}:${password}`);
         const basicAuth = `Basic ${base64}`;
 
-        // GET-Request durch fetch() statt HttpClient von Angular
-        // https://fetch.spec.whatwg.org als Standard fuer Webbrowser
-
+        // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
         const headers = new Headers();
         headers.append('Authorization', basicAuth);
         const request = new Request(loginUri, {
@@ -70,8 +68,7 @@ export class BasicAuthService {
             console.error(
                 'BasicAuthService.login(): Kommunikationsfehler mit d. Appserver',
             );
-        }
-        if (response === undefined) {
+            // eslint-disable-next-line @typescript-eslint/return-await
             return Promise.reject(
                 new Error('Kommunikationsfehler mit dem Appserver'),
             );
@@ -93,7 +90,9 @@ export class BasicAuthService {
             // Base64-String fuer 1 Tag speichern
             basicAuth,
             roles,
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            new Date().getTime() + 24 * 60 * 60 * 1000,
         );
-        return roles;
+        return json;
     }
 }

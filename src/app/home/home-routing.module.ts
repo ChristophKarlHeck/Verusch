@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { RouterModule, Routes } from '@angular/router';
 import { HOME_PATH } from '../shared/paths';
 import { HomeComponent } from './home.component';
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import type { Routes } from '@angular/router';
 
 // Route-Definitionen fuer das Feature-Modul "home":
 // Zuordnung von Pfaden und Komponenten mit HTML-Templates

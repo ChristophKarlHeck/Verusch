@@ -22,13 +22,13 @@ export const HOME_PATH = 'home';
 
 // siehe proxy.conf.json und angular.json
 const SCHEME = 'https';
-const PORT = 4200;
+const PORT = 443;
 const SERVERNAME = 'localhost';
 const BASE_PATH = '/rest';
 
 // CORS statt Proxy:
 // const SCHEME = 'https'
-// const PORT = 3000
+// const PORT = 8443
 // const SERVERNAME = 'localhost'
 // const BASE_PATH = '/'
 
@@ -38,6 +38,6 @@ const BASE_PATH = '/rest';
 export const BASE_URI = `${SCHEME}://${SERVERNAME}:${PORT}${BASE_PATH}`;
 
 /**
- * Pfad beim REST-Server fuer buecher
+ * Pfad beim REST-Server fuer kunden
  */
-export const BUECHER_PATH_REST = 'buecher';
+export const KUNDEN_PATH_REST = '';

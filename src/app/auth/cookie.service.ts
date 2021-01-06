@@ -15,14 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Alternativen: Local Storage oder Session-Cookies mit dem Token
-
 import { Injectable } from '@angular/core';
 
 // Namen der Cookies: nur als Speichermechanismus (nicht zum Server übertragen):
 // Ablaufdatum oder Session-Cookie (Lebensdauer gebunden an Tab).
 // Kein XSS (Cross-Site Scripting) wie bei Local Storage
 // Evtl. CSRF (Cross-Site Request Forgery)
+// Alternativen: Local Storage oder Session-Cookies mit dem Token
 
 const AUTHORIZATION = 'authorization';
 const ROLES = 'roles';

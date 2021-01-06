@@ -28,7 +28,6 @@ import { Component, VERSION } from '@angular/core';
 //  * Logik durch JavaScript
 // https://developer.mozilla.org/docs/Web/Web_Components
 // https://developer.mozilla.org/docs/Web/Web_Components/Shadow_DOM
-// BackboneJS war 2010 das erste komponentenorientierte, clientseitige Web-Framework
 
 // "Composite Pattern" bei UIs: Eine UI-Komponente besteht aus wiederum aus
 // einfachen UI-Komponenten, z.B. ein Suchformular besteht aus einem Label,
@@ -63,14 +62,14 @@ import { Component, VERSION } from '@angular/core';
     //       </hs-header>
     //       <hs-main>
     //           <router-outlet>
-    //               <hs-suche-buecher>
+    //               <hs-suche-kunden>
     //                   <hs-suchformular>
     //                       ...
     //                   </hs-suchformular>
     //                   <hs-suchergebnis>
     //                       ...
     //                   </hs-suchergebnis>
-    //               </hs-suche-buecher>
+    //               </hs-suche-kunden>
     //           <router-outlet>
     //       </hs-main>
     //   </hs-root>
@@ -129,32 +128,20 @@ export class AppComponent {
 
     private static checkEsVersion() {
         try {
-            eval('const foo = 10_000;'); // eslint-disable-line no-eval
+            eval('class Foo { #bar; }'); // eslint-disable-line no-eval
             // optional catch binding
         } catch {
-            console.error(
-                'ES 2021 wird durch den Webbrowser NICHT unterstuetzt.',
-            );
             try {
-                eval('class Foo { #bar; }'); // eslint-disable-line no-eval
-                console.error(
-                    'ES 2020 wird durch den Webbrowser NICHT unterstuetzt.',
-                );
+                eval('[0,[1]].flat();'); // eslint-disable-line no-eval
             } catch {
-                try {
-                    eval('[0,[1]].flat();'); // eslint-disable-line no-eval
-                } catch {
-                    console.error(
-                        'ES 2019 wird durch den Webbrowser NICHT unterstuetzt.',
-                    );
-                    return;
-                }
-                console.log('ES 2019 wird durch den Webbrowser unterstuetzt.');
+                console.error(
+                    'ES 2019 wird durch den Webbrowser NICHT unterstuetzt.',
+                );
                 return;
             }
-            console.log('ES 2020 wird durch den Webbrowser unterstuetzt.');
+            console.log('ES 2019 wird durch den Webbrowser unterstuetzt.');
             return;
         }
-        console.log('ES 2021 wird durch den Webbrowser z.T. unterstuetzt.');
+        console.log('ES 2020 wird durch den Webbrowser unterstuetzt.');
     }
 }

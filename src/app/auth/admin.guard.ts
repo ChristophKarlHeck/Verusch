@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {
+import {
     ActivatedRouteSnapshot,
-    CanActivate,
+    Router,
     RouterStateSnapshot,
     UrlTree,
 } from '@angular/router';
-import { AuthService } from './auth.service'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+import { AuthService } from './auth.service';
+import type { CanActivate } from '@angular/router';
 import { Injectable } from '@angular/core';
-import type { Observable } from 'rxjs';
-import { Router } from '@angular/router'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+import { Observable } from 'rxjs';
 
 // https://angular.io/guide/router#can-activate-guard
 // https://angular.io/api/router/CanActivate
@@ -41,7 +41,7 @@ export class AdminGuard implements CanActivate {
 
     canActivate(
         _: ActivatedRouteSnapshot, // eslint-disable-line @typescript-eslint/no-unused-vars
-        __: RouterStateSnapshot, // eslint-disable-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
+        __: RouterStateSnapshot, // eslint-disable-line @typescript-eslint/no-unused-vars
     ):
         | Observable<boolean | UrlTree>
         | Promise<boolean | UrlTree>

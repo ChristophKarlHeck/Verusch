@@ -13,22 +13,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-@import '../../sass/colors';
-
-$gradient: url('/assets/img/gradientBlueSky.png');
+@import "../../sass/colors";
 
 // Vorsicht bei CSS-Selektoren: Namespaces, um Kollisionen zu vermeiden
 .hs-nav {
   background-color: $background-color;
-  background-image: $gradient;
-  background-position: left top;
   background-repeat: repeat-x;
+  background-position: left top;
   // display: block;
 }
 
 // wird nicht benutzt
 .router-link-active {
-  font-stretch: expanded;
   font-style: italic;
   font-weight: bold;
+  font-stretch: expanded;
 }

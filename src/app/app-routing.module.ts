@@ -15,15 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { RouterModule, Routes } from '@angular/router';
 import { HOME_PATH } from './shared';
 import { HomeComponent } from './home/home.component';
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import type { Routes } from '@angular/router';
 
 // Route-Definitionen fuer den Root-Router
-// Eine Route leitet zu einer neuen Ansicht ("View") in der SPA, wobei die
-// vorherige Ansicht ueberdeckt bzw. ausgeblendet wird.
 const routes: Routes = [
     {
         path: '',
@@ -36,15 +33,12 @@ const routes: Routes = [
         component: HomeComponent,
     },
     {
-        path: 'buecher',
+        path: 'kunden',
         // Lazy Loading durch dynamische Imports
         // loadChildren statt component wie bei 'home'
         loadChildren: async () => {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            const { BuchRoutingModule } = await import(
-                './buch/buch-routing.module'
-            );
-            return BuchRoutingModule;
+            const mod = await import('./kunde/kunde-routing.module');
+            return mod.KundeRoutingModule;
         },
     },
 ];

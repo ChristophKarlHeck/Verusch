@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AuthService, ROLLE_ADMIN } from '../../auth/auth.service'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+import { AuthService, ROLLE_ADMIN } from '../../auth/auth.service';
+import type { OnDestroy, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
-import type { OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 /**
  * Komponente f&uuml;r die Navigationsleiste mit dem Tag &lt;hs-nav&gt;.
@@ -28,31 +27,31 @@ import { tap } from 'rxjs/operators';
     selector: 'hs-nav',
     templateUrl: './nav.component.html',
 })
-export class NavComponent implements OnInit {
-    isAdmin$ = new Subject<boolean>();
+export class NavComponent implements OnInit, OnDestroy {
+    isAdmin!: boolean;
+
+    private isAdminSubscription!: Subscription;
 
     constructor(private readonly authService: AuthService) {
         console.log('NavComponent.constructor()');
     }
 
     ngOnInit() {
-        // beobachten, ob es Informationen zur Rolle "admin" gibt
-        // Observable.subscribe() aus RxJS liefert ein Subscription Objekt,
-        // mit dem man den Request auch abbrechen ("cancel") kann
-        // https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/operators/subscribe.md
-        // http://stackoverflow.com/questions/34533197/what-is-the-difference-between-rx-observable-subscribe-and-foreach
-        // https://xgrommx.github.io/rx-book/content/observable/observable_instance_methods/subscribe.html
-        // Funktion als Funktionsargument, d.h. Code als Daten uebergeben
-        // Suffix "$" wird als "Finnish Notation" bezeichnet https://medium.com/@benlesh/observables-and-finnish-notation-df8356ed1c9b
+        this.isAdmin = this.authService.isAdmin;
 
-        this.authService.rollen$
-            .pipe(
-                tap((rollen: string[]) =>
-                    // ein neues Observable vom Typ boolean
-                    this.isAdmin$.next(rollen.includes(ROLLE_ADMIN)),
-                ),
-            )
-            // das Subject von AuthService abonnieren bzw. beobachten
-            .subscribe();
+        // beobachten, ob es Informationen zur Rolle "admin" gibt
+        this.isAdminSubscription = this.subscribeIsAdmin();
+    }
+
+    ngOnDestroy() {
+        this.isAdminSubscription.unsubscribe();
+    }
+
+    private subscribeIsAdmin() {
+        const next = (event: Array<string>) => {
+            this.isAdmin = event !== undefined && event.includes(ROLLE_ADMIN);
+            console.log('NavComponent.isAdmin:', this.isAdmin);
+        };
+        return this.authService.rollenSubject.subscribe(next);
     }
 }

@@ -17,7 +17,7 @@
 
 import { Component } from '@angular/core';
 import type { OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'hs-home',
@@ -33,6 +33,6 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.title.setTitle('Beispiel');
+        this.title.setTitle('Abgabe2');
     }
 }

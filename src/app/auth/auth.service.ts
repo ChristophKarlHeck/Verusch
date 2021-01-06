@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-underscore-dangle */
 /*
  * Copyright (C) 2016 - present Juergen Zimmermann, Hochschule Karlsruhe
  *
@@ -15,38 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { CookieService } from './cookie.service'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+import { BasicAuthService } from './basic-auth.service';
+import { CookieService } from './cookie.service';
 import { Injectable } from '@angular/core';
-import { JwtService } from './jwt.service'; // eslint-disable-line @typescript-eslint/consistent-type-imports
 import { Subject } from 'rxjs';
 
-export const ROLLE_ADMIN = 'admin';
+export const ROLLE_ADMIN = 'ROLE_ADMIN';
 // Spring Security:
 // export const ROLLE_ADMIN = 'ROLE_ADMIN'
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-    // in RxJS: Observables = Event-Streaming mit Promises
-    // Subject statt Basisklasse Observable: in login() und logout() wird next() aufgerufen
-    // Suffix "$" wird als "Finnish Notation" bezeichnet https://medium.com/@benlesh/observables-and-finnish-notation-df8356ed1c9b
-    readonly isLoggedIn$ = new Subject<boolean>();
+    // Subject statt Observable:
+    // in login() und logout() wird Subject.next() aufgerufen
+    private readonly _isLoggedInSubject = new Subject<boolean>();
 
-    // public fuer z.B. nav.component mit der Property isAdmin
-    readonly rollen$ = new Subject<string[]>();
+    private readonly _rollenSubject = new Subject<Array<string>>();
 
     constructor(
-        private readonly jwtService: JwtService,
+        private readonly basicAuthService: BasicAuthService,
         private readonly cookieService: CookieService,
     ) {
-        // OnInit ist nur bei @Component moeglich
-        if (this.isLoggedIn) {
-            console.log('AuthService.constructor(): bereits eingeloggt');
-            this.isLoggedIn$.next(true);
-            return;
-        }
-
-        console.log('AuthService.constructor(): noch nicht eingeloggt');
-        this.isLoggedIn$.next(false);
+        console.log('AuthService.constructor()');
     }
 
     /**
@@ -58,34 +50,36 @@ export class AuthService {
         console.log(
             `AuthService.login(): username=${username}, password=${password}`,
         );
-        let rollen: string[];
+        let rollen: Array<string> = [];
         try {
-            // this.basicAuthService.login(username, password)
-            rollen = await this.jwtService.login(username, password);
-        } catch (err: unknown) {
-            this.loginError(err);
-            return;
+            rollen = await this.basicAuthService.login(username, password);
+            // rollen = await this.jwtService.login(username, password);
+            console.log('AuthService.login()', rollen);
+            this.isLoggedInSubject.next(true);
+        } catch (err) {
+            console.warn('AuthService.login(): Exception', err);
+            this.isLoggedInSubject.next(false);
         }
 
-        console.log('AuthService.login(): rollen', rollen);
-        this.isLoggedIn$.next(true);
-        this.rollen$.next(rollen);
-    }
-
-    private loginError(err: unknown) {
-        console.warn('AuthService.loginError(): err', err);
-        this.isLoggedIn$.next(false);
-        this.rollen$.next([]);
+        this.rollenSubject.next(rollen);
     }
 
     /**
      * @return void
      */
     logout() {
-        console.log('AuthService.logout()');
+        console.warn('AuthService.logout()');
         this.cookieService.deleteAuthorization();
-        this.isLoggedIn$.next(false);
-        this.rollen$.next([]);
+        this.isLoggedInSubject.next(false);
+        this.rollenSubject.next([]);
+    }
+
+    get isLoggedInSubject() {
+        return this._isLoggedInSubject;
+    }
+
+    get rollenSubject() {
+        return this._rollenSubject;
     }
 
     /**
@@ -96,8 +90,6 @@ export class AuthService {
     }
 
     /**
-     * Statische Abfrage, z.B. beim Start des Browsers, wenn noch kein
-     * Click-Ereignis eingetreten ist.
      * @return true, falls ein User eingeloggt ist; sonst false.
      */
     get isLoggedIn() {
@@ -105,8 +97,6 @@ export class AuthService {
     }
 
     /**
-     * Statische Abfrage, z.B. beim Start des Browsers, wenn noch kein
-     * Click-Ereignis eingetreten ist oder bei der Anzeige des Suchergebnisses.
      * @return true, falls ein User in der Rolle "admin" eingeloggt ist;
      *         sonst false.
      */
@@ -119,6 +109,6 @@ export class AuthService {
 
         // z.B. ['admin', 'mitarbeiter']
         const rolesArray = rolesStr.split(',');
-        return rolesArray.includes(ROLLE_ADMIN);
+        return rolesArray !== undefined && rolesArray.includes(ROLLE_ADMIN);
     }
 }

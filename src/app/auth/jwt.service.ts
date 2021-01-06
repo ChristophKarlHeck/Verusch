@@ -16,7 +16,7 @@
  */
 
 import { BASE_URI, HttpStatus } from '../shared';
-import { CookieService } from './cookie.service'; // eslint-disable-line @typescript-eslint/consistent-type-imports
+import { CookieService } from './cookie.service';
 import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
@@ -34,17 +34,16 @@ export class JwtService {
         console.log('JwtService.constructor()');
     }
 
+    // GET-Request durch fetch() von ES statt HttpClient von Angular
     /* eslint-disable max-lines-per-function,max-statements */
     async login(
         username: string | undefined,
         password: string | undefined,
-    ): Promise<string[]> {
+    ): Promise<Array<string>> {
         const loginUri = `${BASE_URI}/login`;
         console.log(`JwtService.login(): loginUri=${loginUri}`);
 
-        // GET-Request durch fetch() statt HttpClient von Angular
-        // https://fetch.spec.whatwg.org als Standard fuer Webbrowser
-
+        // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
         const headers = new Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
         const request = new Request(loginUri, {
@@ -55,6 +54,8 @@ export class JwtService {
 
         let response: Response | undefined;
         try {
+            // ky ist eine Alternative zu fetch
+            // https://github.com/sindresorhus/ky
             response = await fetch(request);
             // Optional catch binding parameters
         } catch {
@@ -75,8 +76,6 @@ export class JwtService {
         }
 
         const json = await response.json();
-        // console.log(`JwtService.login(): json=${json}`);
-        // console.log(`JwtService.login(): json=${JSON.stringify(json)}`);
         console.log('JwtService.login(): json', json);
         const { token, roles } = json;
         const authorization = `Bearer ${token as string}`;
@@ -111,7 +110,9 @@ export class JwtService {
     // https://github.com/auth0/angular2-jwt/blob/master/angular2-jwt.ts#L147
     private decodeToken(token: string) {
         // Destructuring
-        const [, payload, signature]: (string | undefined)[] = token.split('.');
+        const [, payload, signature]: Array<string | undefined> = token.split(
+            '.',
+        );
         if (signature === undefined) {
             console.error(
                 'JwtService.decodeToken(): JWT enthaelt keine Signature',
@@ -119,10 +120,7 @@ export class JwtService {
             return;
         }
 
-        let base64Token = payload?.replace(/-/gu, '+')?.replace(/_/gu, '/');
-        if (base64Token === undefined) {
-            return Promise.reject(new Error('Interner Fehler beim Einloggen'));
-        }
+        let base64Token = payload.replace(/-/gu, '+').replace(/_/gu, '/');
         /* eslint-disable @typescript-eslint/no-magic-numbers */
         switch (base64Token.length % 4) {
             case 0:
@@ -146,7 +144,12 @@ export class JwtService {
         const decodedStr = decodeURIComponent(
             encodeURIComponent(window.atob(base64Token)),
         );
-
+        if (decodedStr === undefined) {
+            console.error(
+                'JwtService.decodeToken(): JWT kann nicht decodiert werden.',
+            );
+            return;
+        }
         return JSON.parse(decodedStr);
     }
 }

@@ -15,17 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {
+import {
+    HTTP_INTERCEPTORS,
     HttpEvent,
     HttpHandler,
-    HttpInterceptor,
     HttpRequest,
 } from '@angular/common/http';
-import { AuthService } from './auth.service'; // eslint-disable-line @typescript-eslint/consistent-type-imports
-import type { ClassProvider } from '@angular/core';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthService } from './auth.service';
+import type { HttpInterceptor } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import type { Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthInterceptor implements HttpInterceptor {
@@ -40,10 +39,11 @@ export class AuthInterceptor implements HttpInterceptor {
         const authorizationStr = `${this.authService.authorization}`;
         console.log(`authorizationStr=${authorizationStr}`);
 
+        /* eslint-disable object-curly-newline */
         const requestWithAuthorization = request.clone({
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             setHeaders: { Authorization: authorizationStr },
         });
+        /* eslint-enable object-curly-newline */
 
         return next.handle(requestWithAuthorization);
     }
@@ -51,8 +51,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
 // https://angular.io/guide/http#intercepting-requests-and-responses
 // https://next.angular.io/guide/http#intercepting-requests-and-responses
-export const authInterceptorProvider: ClassProvider = {
-    provide: HTTP_INTERCEPTORS,
-    useClass: AuthInterceptor,
-    multi: true,
-};
+export const authInterceptorProviders = [
+    {
+        provide: HTTP_INTERCEPTORS,
+        useClass: AuthInterceptor,
+        multi: true,
+    },
+];
